@@ -1,13 +1,13 @@
-# MarkItDown Sample Plugin
+# Plugin de exemplo do MarkItDown
 
 [![PyPI](https://img.shields.io/pypi/v/markitdown-sample-plugin.svg)](https://pypi.org/project/markitdown-sample-plugin/)
 ![PyPI - Downloads](https://img.shields.io/pypi/dd/markitdown-sample-plugin)
 [![Built by AutoGen Team](https://img.shields.io/badge/Built%20by-AutoGen%20Team-blue)](https://github.com/microsoft/autogen)
 
 
-This project shows how to create a sample plugin for MarkItDown. The most important parts are as follows:
+Este projeto mostra como criar um plugin de exemplo para o MarkItDown. As partes mais importantes são as seguintes:
 
-First, implement your custom DocumentConverter:
+Primeiro, implemente o seu DocumentConverter personalizado:
 
 ```python
 from typing import BinaryIO, Any
@@ -27,7 +27,7 @@ class RtfConverter(DocumentConverter):
         **kwargs: Any,
     ) -> bool:
 
-        # Implement logic to check if the file stream is an RTF file
+        # Implemente a lógica para verificar se o fluxo de arquivo é um arquivo RTF
         # ...
         raise NotImplementedError()
 
@@ -39,60 +39,60 @@ class RtfConverter(DocumentConverter):
         **kwargs: Any,
     ) -> DocumentConverterResult:
 
-        # Implement logic to convert the file stream to Markdown
+        # Implemente a lógica para converter o fluxo de arquivo em Markdown
         # ...
         raise NotImplementedError()
 ```
 
-Next, make sure your package implements and exports the following:
+Em seguida, garanta que o seu pacote implemente e exporte o seguinte:
 
 ```python
-# The version of the plugin interface that this plugin uses.
-# The only supported version is 1 for now.
+# A versão da interface de plugin que este plugin utiliza.
+# A única versão suportada por enquanto é a 1.
 __plugin_interface_version__ = 1
 
-# The main entrypoint for the plugin. This is called each time MarkItDown instances are created.
+# O ponto de entrada principal do plugin. É chamado sempre que instâncias do MarkItDown são criadas.
 def register_converters(markitdown: MarkItDown, **kwargs):
     """
-    Called during construction of MarkItDown instances to register converters provided by plugins.
+    Chamado durante a construção de instâncias do MarkItDown para registrar os conversores fornecidos pelos plugins.
     """
 
-    # Simply create and attach an RtfConverter instance
+    # Basta criar e anexar uma instância de RtfConverter
     markitdown.register_converter(RtfConverter())
 ```
 
 
-Finally, create an entrypoint in the `pyproject.toml` file:
+Por fim, crie um entry point no arquivo `pyproject.toml`:
 
 ```toml
 [project.entry-points."markitdown.plugin"]
 sample_plugin = "markitdown_sample_plugin"
 ```
 
-Here, the value of `sample_plugin` can be any key, but should ideally be the name of the plugin. The value is the fully qualified name of the package implementing the plugin.
+Aqui, o valor de `sample_plugin` pode ser qualquer chave, mas idealmente deve ser o nome do plugin. O valor é o nome totalmente qualificado do pacote que implementa o plugin.
 
 
-## Installation
+## Instalação
 
-To use the plugin with MarkItDown, it must be installed. To install the plugin from the current directory use:
+Para usar o plugin com o MarkItDown, ele precisa estar instalado. Para instalar o plugin a partir do diretório atual, use:
 
 ```bash
 pip install -e .
 ```
 
-Once the plugin package is installed, verify that it is available to MarkItDown by running:
+Depois que o pacote do plugin estiver instalado, verifique se ele está disponível para o MarkItDown executando:
 
 ```bash
 markitdown --list-plugins
 ```
 
-To use the plugin for a conversion use the `--use-plugins` flag. For example, to convert an RTF file:
+Para usar o plugin em uma conversão, utilize a flag `--use-plugins`. Por exemplo, para converter um arquivo RTF:
 
 ```bash
 markitdown --use-plugins path-to-file.rtf
 ```
 
-In Python, plugins can be enabled as follows:
+Em Python, os plugins podem ser ativados assim:
 
 ```python
 from markitdown import MarkItDown
@@ -102,10 +102,10 @@ result = md.convert("path-to-file.rtf")
 print(result.text_content)
 ```
 
-## Trademarks
+## Marcas registradas
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
-trademarks or logos is subject to and must follow
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+Este projeto pode conter marcas registradas ou logotipos de projetos, produtos ou serviços. O uso autorizado de marcas
+registradas ou logotipos da Microsoft está sujeito e deve seguir as
+[Diretrizes de Marca Registrada e Marca da Microsoft](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+O uso de marcas registradas ou logotipos da Microsoft em versões modificadas deste projeto não deve causar confusão nem sugerir patrocínio da Microsoft.
+Qualquer uso de marcas registradas ou logotipos de terceiros está sujeito às políticas desses terceiros.

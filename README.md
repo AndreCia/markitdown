@@ -5,62 +5,62 @@
 [![Built by AutoGen Team](https://img.shields.io/badge/Built%20by-AutoGen%20Team-blue)](https://github.com/microsoft/autogen)
 
 > [!IMPORTANT]
-> MarkItDown performs I/O with the privileges of the current process. Like open() or requests.get(), it will access resources that the process itself can access. Sanitize your inputs in untrusted environments, and call the narrowest `convert_*` function needed for your use case (e.g., `convert_stream()`, or `convert_local()`). See the [Security Considerations](#security-considerations) section of the documentation for more information.
+> O MarkItDown realiza operações de entrada e saída com os privilégios do processo atual. Assim como `open()` ou `requests.get()`, ele acessa os recursos que o próprio processo consegue acessar. Sanitize suas entradas em ambientes não confiáveis e chame a função `convert_*` mais restrita que atenda ao seu caso de uso (por exemplo, `convert_stream()` ou `convert_local()`). Veja a seção [Considerações de segurança](#considerações-de-segurança) da documentação para mais informações.
 
-MarkItDown is a lightweight Python utility for converting various files to Markdown for use with LLMs and related text analysis pipelines. To this end, it is most comparable to [textract](https://github.com/deanmalmgren/textract), but with a focus on preserving important document structure and content as Markdown (including: headings, lists, tables, links, etc.) While the output is often reasonably presentable and human-friendly, it is meant to be consumed by text analysis tools -- and may not be the best option for high-fidelity document conversions for human consumption.
+O MarkItDown é um utilitário Python leve para converter diversos tipos de arquivo em Markdown, voltado ao uso com LLMs e com pipelines de análise de texto. Nesse sentido, ele é mais comparável ao [textract](https://github.com/deanmalmgren/textract), mas com foco em preservar a estrutura e o conteúdo importantes do documento em Markdown (incluindo títulos, listas, tabelas, links, etc.). Embora o resultado seja quase sempre apresentável e legível para pessoas, ele foi pensado para ser consumido por ferramentas de análise de texto e pode não ser a melhor opção para conversões de alta fidelidade destinadas à leitura humana.
 
-MarkItDown currently supports the conversion from:
+Atualmente, o MarkItDown suporta a conversão de:
 
 - PDF
 - PowerPoint
 - Word
 - Excel
-- Images (EXIF metadata and OCR)
-- Audio (EXIF metadata and speech transcription)
+- Imagens (metadados EXIF e OCR)
+- Áudio (metadados EXIF e transcrição de fala)
 - HTML
-- Text-based formats (CSV, JSON, XML)
-- ZIP files (iterates over contents)
-- YouTube URLs
+- Formatos baseados em texto (CSV, JSON, XML)
+- Arquivos ZIP (percorre o conteúdo)
+- URLs do YouTube
 - EPubs
-- ... and more!
+- ... e mais!
 
-## Why Markdown?
+## Por que Markdown?
 
-Markdown is extremely close to plain text, with minimal markup or formatting, but still
-provides a way to represent important document structure. Mainstream LLMs, such as
-OpenAI's GPT-4o, natively "_speak_" Markdown, and often incorporate Markdown into their
-responses unprompted. This suggests that they have been trained on vast amounts of
-Markdown-formatted text, and understand it well. As a side benefit, Markdown conventions
-are also highly token-efficient.
+O Markdown é extremamente próximo do texto puro, com marcação e formatação mínimas, mas ainda assim
+oferece uma forma de representar a estrutura importante de um documento. LLMs populares, como o
+GPT-4o da OpenAI, "_falam_" Markdown nativamente e com frequência incorporam Markdown em suas
+respostas sem que isso seja solicitado. Isso sugere que foram treinadas com enormes volumes de
+texto formatado em Markdown e que o compreendem bem. Como benefício adicional, as convenções do
+Markdown também são bastante eficientes em consumo de tokens.
 
-## Prerequisites
-MarkItDown requires Python 3.10 or higher. It is recommended to use a virtual environment to avoid dependency conflicts.
+## Pré-requisitos
+O MarkItDown requer Python 3.10 ou superior. Recomenda-se usar um ambiente virtual para evitar conflitos de dependências.
 
-With the standard Python installation, you can create and activate a virtual environment using the following commands:
+Com a instalação padrão do Python, você pode criar e ativar um ambiente virtual com os comandos abaixo:
 
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 ```
 
-If using `uv`, you can create a virtual environment with:
+Se estiver usando `uv`, você pode criar um ambiente virtual com:
 
 ```bash
 uv venv --python=3.12 .venv
 source .venv/bin/activate
-# NOTE: Be sure to use 'uv pip install' rather than just 'pip install' to install packages in this virtual environment
+# OBSERVAÇÃO: use 'uv pip install' em vez de apenas 'pip install' para instalar pacotes neste ambiente virtual
 ```
 
-If you are using Anaconda, you can create a virtual environment with:
+Se estiver usando Anaconda, você pode criar um ambiente virtual com:
 
 ```bash
 conda create -n markitdown python=3.12
 conda activate markitdown
 ```
 
-## Installation
+## Instalação
 
-To install MarkItDown, use pip: `pip install 'markitdown[all]'`. Alternatively, you can install it from the source:
+Para instalar o MarkItDown, use o pip: `pip install 'markitdown[all]'`. Como alternativa, você pode instalá-lo a partir do código-fonte:
 
 ```bash
 git clone git@github.com:microsoft/markitdown.git
@@ -68,79 +68,79 @@ cd markitdown
 pip install -e 'packages/markitdown[all]'
 ```
 
-## Usage
+## Uso
 
-### Command-Line
+### Linha de comando
 
 ```bash
 markitdown path-to-file.pdf > document.md
 ```
 
-Or use `-o` to specify the output file:
+Ou use `-o` para especificar o arquivo de saída:
 
 ```bash
 markitdown path-to-file.pdf -o document.md
 ```
 
-You can also pipe content:
+Você também pode enviar o conteúdo por pipe:
 
 ```bash
 cat path-to-file.pdf | markitdown
 ```
 
-### Optional Dependencies
-MarkItDown has optional dependencies for activating various file formats. Earlier in this document, we installed all optional dependencies with the `[all]` option. However, you can also install them individually for more control. For example:
+### Dependências opcionais
+O MarkItDown possui dependências opcionais que ativam o suporte a vários formatos de arquivo. Antes, neste documento, instalamos todas as dependências opcionais com a opção `[all]`. No entanto, você também pode instalá-las individualmente para ter mais controle. Por exemplo:
 
 ```bash
 pip install 'markitdown[pdf, docx, pptx]'
 ```
 
-will install only the dependencies for PDF, DOCX, and PPTX files.
+instalará apenas as dependências para arquivos PDF, DOCX e PPTX.
 
-At the moment, the following optional dependencies are available:
+No momento, as seguintes dependências opcionais estão disponíveis:
 
-* `[all]` Installs all optional dependencies
-* `[pptx]` Installs dependencies for PowerPoint files
-* `[docx]` Installs dependencies for Word files
-* `[xlsx]` Installs dependencies for Excel files
-* `[xls]` Installs dependencies for older Excel files
-* `[pdf]` Installs dependencies for PDF files
-* `[outlook]` Installs dependencies for Outlook messages
-* `[az-doc-intel]` Installs dependencies for Azure Document Intelligence
-* `[az-content-understanding]` Installs dependencies for Azure Content Understanding
-* `[audio-transcription]` Installs dependencies for audio transcription of wav and mp3 files
-* `[youtube-transcription]` Installs dependencies for fetching YouTube video transcription
+* `[all]` Instala todas as dependências opcionais
+* `[pptx]` Instala as dependências para arquivos do PowerPoint
+* `[docx]` Instala as dependências para arquivos do Word
+* `[xlsx]` Instala as dependências para arquivos do Excel
+* `[xls]` Instala as dependências para arquivos antigos do Excel
+* `[pdf]` Instala as dependências para arquivos PDF
+* `[outlook]` Instala as dependências para mensagens do Outlook
+* `[az-doc-intel]` Instala as dependências para o Azure Document Intelligence
+* `[az-content-understanding]` Instala as dependências para o Azure Content Understanding
+* `[audio-transcription]` Instala as dependências para transcrição de áudio de arquivos wav e mp3
+* `[youtube-transcription]` Instala as dependências para obter a transcrição de vídeos do YouTube
 
 ### Plugins
 
-MarkItDown also supports 3rd-party plugins. Plugins are disabled by default. To list installed plugins:
+O MarkItDown também suporta plugins de terceiros. Os plugins vêm desativados por padrão. Para listar os plugins instalados:
 
 ```bash
 markitdown --list-plugins
 ```
 
-To enable plugins use:
+Para ativar os plugins, use:
 
 ```bash
 markitdown --use-plugins path-to-file.pdf
 ```
 
-To find available plugins, search GitHub for the hashtag `#markitdown-plugin`. To develop a plugin, see `packages/markitdown-sample-plugin`.
+Para encontrar plugins disponíveis, procure no GitHub pela hashtag `#markitdown-plugin`. Para desenvolver um plugin, veja `packages/markitdown-sample-plugin`.
 
-#### markitdown-ocr Plugin
+#### Plugin markitdown-ocr
 
-The `markitdown-ocr` plugin adds OCR support to PDF, DOCX, PPTX, and XLSX converters, extracting text from embedded images using LLM Vision — the same `llm_client` / `llm_model` pattern that MarkItDown already uses for image descriptions. No new ML libraries or binary dependencies required.
+O plugin `markitdown-ocr` adiciona suporte a OCR aos conversores de PDF, DOCX, PPTX e XLSX, extraindo texto de imagens incorporadas por meio de LLM Vision, com o mesmo padrão `llm_client` / `llm_model` que o MarkItDown já usa para descrições de imagens. Não é necessária nenhuma biblioteca de aprendizado de máquina nova nem dependência binária.
 
-**Installation:**
+**Instalação:**
 
 ```bash
 pip install markitdown-ocr
-pip install openai  # or any OpenAI-compatible client
+pip install openai  # ou qualquer cliente compatível com a API da OpenAI
 ```
 
-**Usage:**
+**Uso:**
 
-Pass the same `llm_client` and `llm_model` you would use for image descriptions:
+Informe o mesmo `llm_client` e `llm_model` que você usaria para descrições de imagens:
 
 ```python
 from markitdown import MarkItDown
@@ -155,53 +155,53 @@ result = md.convert("document_with_images.pdf")
 print(result.text_content)
 ```
 
-If no `llm_client` is provided the plugin still loads, but OCR is silently skipped and the standard built-in converter is used instead.
+Se nenhum `llm_client` for fornecido, o plugin ainda é carregado, mas o OCR é silenciosamente ignorado e o conversor padrão embutido é usado no lugar.
 
-See [`packages/markitdown-ocr/README.md`](packages/markitdown-ocr/README.md) for detailed documentation.
+Veja [`packages/markitdown-ocr/README.md`](packages/markitdown-ocr/README.md) para a documentação detalhada.
 
 ### Azure Content Understanding
 
-[Azure Content Understanding](https://learn.microsoft.com/azure/ai-services/content-understanding/) provides higher-quality conversion with structured field extraction (YAML front matter), multi-modal support (documents, images, audio, video), and configurable analyzers.
+O [Azure Content Understanding](https://learn.microsoft.com/azure/ai-services/content-understanding/) oferece conversão de qualidade superior com extração estruturada de campos (front matter em YAML), suporte multimodal (documentos, imagens, áudio, vídeo) e analisadores configuráveis.
 
-Install: `pip install 'markitdown[az-content-understanding]'`
+Instalação: `pip install 'markitdown[az-content-understanding]'`
 
-#### When to use Content Understanding
+#### Quando usar o Content Understanding
 
-Content Understanding is ideal when you need capabilities beyond what built-in or Document Intelligence converters provide:
+O Content Understanding é ideal quando você precisa de recursos que vão além do que os conversores embutidos ou o Document Intelligence oferecem:
 
-- **Audio and video files** — CU is the only option for video, and the higher-quality cloud option for audio. Built-in converters have no video support and only basic audio transcription.
-- **Structured field extraction** — [Prebuilt](https://learn.microsoft.com/azure/ai-services/content-understanding/concepts/prebuilt-analyzers) or [custom-built](https://learn.microsoft.com/azure/ai-services/content-understanding/how-to/customize-analyzer-content-understanding-studio?tabs=portal) analyzers extract domain-specific fields (invoice amounts, receipt dates, contract clauses) serialized as YAML front matter. Neither built-in nor Doc Intel integration exposes fields.
-- **Higher-quality document extraction** — Cloud-based layout analysis and OCR for scanned PDFs, complex tables, and multi-page documents.
-- **Single API for all modalities** — One `cu_endpoint` handles documents, images, audio, and video with automatic analyzer routing.
+- **Arquivos de áudio e vídeo:** o CU é a única opção para vídeo e a opção em nuvem de maior qualidade para áudio. Os conversores embutidos não têm suporte a vídeo e oferecem apenas transcrição básica de áudio.
+- **Extração estruturada de campos:** analisadores [pré-construídos](https://learn.microsoft.com/azure/ai-services/content-understanding/concepts/prebuilt-analyzers) ou [personalizados](https://learn.microsoft.com/azure/ai-services/content-understanding/how-to/customize-analyzer-content-understanding-studio?tabs=portal) extraem campos específicos do domínio (valores de faturas, datas de recibos, cláusulas contratuais) serializados como front matter em YAML. Nem a versão embutida nem a integração com o Doc Intel expõem esses campos.
+- **Extração de documentos com qualidade superior:** análise de layout e OCR na nuvem para PDFs digitalizados, tabelas complexas e documentos de várias páginas.
+- **Uma única API para todas as modalidades:** um único `cu_endpoint` lida com documentos, imagens, áudio e vídeo, com roteamento automático de analisadores.
 
-| Capability | Built-in converters | Azure Document Intelligence | Azure Content Understanding |
+| Recurso | Conversores embutidos | Azure Document Intelligence | Azure Content Understanding |
 |------------|---------------------|-----------------------------|-----------------------------|
-| Document conversion | Offline, format-specific extraction | Cloud layout extraction | Cloud multimodal extraction |
-| Structured fields | Not available | Not exposed by this integration | YAML front matter from analyzer fields |
-| Custom analyzers | Not available | Not configurable in this integration | Supported with `cu_analyzer_id` |
-| Audio and video | Basic audio, no video | Not supported | Audio and video analyzers |
-| Cost | Local compute only | Billable Azure API calls | Billable Azure API calls |
+| Conversão de documentos | Offline, extração específica por formato | Extração de layout na nuvem | Extração multimodal na nuvem |
+| Campos estruturados | Não disponível | Não exposto por esta integração | Front matter em YAML a partir dos campos do analisador |
+| Analisadores personalizados | Não disponível | Não configurável nesta integração | Suportado via `cu_analyzer_id` |
+| Áudio e vídeo | Áudio básico, sem vídeo | Não suportado | Analisadores de áudio e vídeo |
+| Custo | Apenas processamento local | Chamadas cobradas à API do Azure | Chamadas cobradas à API do Azure |
 
-**CLI:**
+**Linha de comando:**
 
 ```bash
 markitdown path-to-file.pdf --use-cu --cu-endpoint "<content_understanding_endpoint>"
 ```
 
-**Python API:**
+**API Python:**
 
 ```python
 from markitdown import MarkItDown
 
-# Zero-config — auto-selects analyzer per file type
+# Sem configuração: seleciona automaticamente o analisador por tipo de arquivo
 md = MarkItDown(cu_endpoint="<content_understanding_endpoint>")
-result = md.convert("report.pdf")   # documents → prebuilt-documentSearch
-result = md.convert("meeting.mp4")  # video → prebuilt-videoSearch
-result = md.convert("call.wav")     # audio → prebuilt-audioSearch
+result = md.convert("report.pdf")   # documentos → prebuilt-documentSearch
+result = md.convert("meeting.mp4")  # vídeo → prebuilt-videoSearch
+result = md.convert("call.wav")     # áudio → prebuilt-audioSearch
 print(result.markdown)
 ```
 
-**With a custom analyzer** (for domain-specific field extraction):
+**Com um analisador personalizado** (para extração de campos específicos do domínio):
 
 ```python
 md = MarkItDown(
@@ -210,7 +210,7 @@ md = MarkItDown(
 )
 result = md.convert("invoice.pdf")
 print(result.markdown)
-# Output includes YAML front matter with extracted fields:
+# A saída inclui front matter em YAML com os campos extraídos:
 # ---
 # contentType: document
 # fields:
@@ -221,44 +221,44 @@ print(result.markdown)
 # ...
 ```
 
-When `cu_analyzer_id` is set, the converter automatically scopes it to compatible file types based on the analyzer's modality. Incompatible types (e.g., audio files with a document analyzer) auto-route to default prebuilt analyzers.
+Quando `cu_analyzer_id` é definido, o conversor restringe automaticamente seu uso aos tipos de arquivo compatíveis, com base na modalidade do analisador. Tipos incompatíveis (por exemplo, arquivos de áudio com um analisador de documentos) são roteados automaticamente para os analisadores pré-construídos padrão.
 
-**Cost note:** Each `convert()` call for a CU-routed format is a billable Azure API call. Use `cu_file_types` to restrict which formats route to CU:
+**Observação sobre custos:** cada chamada de `convert()` para um formato roteado ao CU é uma chamada cobrada à API do Azure. Use `cu_file_types` para restringir quais formatos são roteados ao CU:
 
 ```python
 from markitdown.converters import ContentUnderstandingFileType
 
 md = MarkItDown(
     cu_endpoint="<content_understanding_endpoint>",
-    cu_file_types=[ContentUnderstandingFileType.PDF],  # only PDFs use CU
+    cu_file_types=[ContentUnderstandingFileType.PDF],  # apenas PDFs usam o CU
 )
 ```
 
-More information about Azure Content Understanding can be found [here](https://learn.microsoft.com/azure/ai-services/content-understanding/).
+Mais informações sobre o Azure Content Understanding podem ser encontradas [aqui](https://learn.microsoft.com/azure/ai-services/content-understanding/).
 
 ### Azure Document Intelligence
 
-To use Microsoft Document Intelligence for conversion:
+Para usar o Microsoft Document Intelligence na conversão:
 
 ```bash
 markitdown path-to-file.pdf -o document.md -d -e "<document_intelligence_endpoint>"
 ```
 
-More information about how to set up an Azure Document Intelligence Resource can be found [here](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/how-to-guides/create-document-intelligence-resource?view=doc-intel-4.0.0)
+Mais informações sobre como configurar um recurso do Azure Document Intelligence podem ser encontradas [aqui](https://learn.microsoft.com/en-us/azure/ai-services/document-intelligence/how-to-guides/create-document-intelligence-resource?view=doc-intel-4.0.0)
 
-### Python API
+### API Python
 
-Basic usage in Python:
+Uso básico em Python:
 
 ```python
 from markitdown import MarkItDown
 
-md = MarkItDown(enable_plugins=False) # Set to True to enable plugins
+md = MarkItDown(enable_plugins=False) # Defina como True para ativar os plugins
 result = md.convert("test.xlsx")
 print(result.text_content)
 ```
 
-Document Intelligence conversion in Python:
+Conversão com Document Intelligence em Python:
 
 ```python
 from markitdown import MarkItDown
@@ -268,7 +268,7 @@ result = md.convert("test.pdf")
 print(result.text_content)
 ```
 
-To use Large Language Models for image descriptions (currently only for pptx and image files), provide `llm_client` and `llm_model`:
+Para usar modelos de linguagem grandes na descrição de imagens (atualmente apenas para arquivos pptx e de imagem), informe `llm_client` e `llm_model`:
 
 ```python
 from markitdown import MarkItDown
@@ -287,74 +287,74 @@ docker build -t markitdown:latest .
 docker run --rm -i markitdown:latest < ~/your-file.pdf > output.md
 ```
 
-## Contributing
+## Contribuindo
 
-This project welcomes contributions and suggestions. Most contributions require you to agree to a
-Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
-the rights to use your contribution. For details, visit https://cla.opensource.microsoft.com.
+Este projeto recebe bem contribuições e sugestões. A maioria das contribuições exige que você concorde com um
+Contrato de Licença de Contribuidor (CLA), declarando que você tem o direito de nos conceder, e de fato nos concede,
+os direitos de uso da sua contribuição. Para detalhes, acesse https://cla.opensource.microsoft.com.
 
-When you submit a pull request, a CLA bot will automatically determine whether you need to provide
-a CLA and decorate the PR appropriately (e.g., status check, comment). Simply follow the instructions
-provided by the bot. You will only need to do this once across all repos using our CLA.
+Quando você envia um pull request, um bot de CLA determina automaticamente se você precisa fornecer
+um CLA e sinaliza o PR de forma apropriada (por exemplo, com uma verificação de status ou um comentário). Basta seguir as instruções
+fornecidas pelo bot. Você só precisará fazer isso uma vez em todos os repositórios que usam nosso CLA.
 
-This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/).
-For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or
-contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
+Este projeto adotou o [Código de Conduta de Código Aberto da Microsoft](https://opensource.microsoft.com/codeofconduct/).
+Para mais informações, veja o [FAQ do Código de Conduta](https://opensource.microsoft.com/codeofconduct/faq/) ou
+entre em contato pelo e-mail [opencode@microsoft.com](mailto:opencode@microsoft.com) com quaisquer perguntas ou comentários adicionais.
 
-### How to Contribute
+### Como contribuir
 
-You can help by looking at issues or helping review PRs. Any issue or PR is welcome, but we have also marked some as 'open for contribution' and 'open for reviewing' to help facilitate community contributions. These are of course just suggestions and you are welcome to contribute in any way you like.
+Você pode ajudar analisando issues ou revisando PRs. Qualquer issue ou PR é bem-vindo, mas também marcamos alguns como 'open for contribution' e 'open for reviewing' para facilitar as contribuições da comunidade. São apenas sugestões, é claro, e você pode contribuir da forma que preferir.
 
 <div align="center">
 
-|            | All                                                          | Especially Needs Help from Community                                                                                                      |
-| ---------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| **Issues** | [All Issues](https://github.com/microsoft/markitdown/issues) | [Issues open for contribution](https://github.com/microsoft/markitdown/issues?q=is%3Aissue+is%3Aopen+label%3A%22open+for+contribution%22) |
-| **PRs**    | [All PRs](https://github.com/microsoft/markitdown/pulls)     | [PRs open for reviewing](https://github.com/microsoft/markitdown/pulls?q=is%3Apr+is%3Aopen+label%3A%22open+for+reviewing%22)              |
+|            | Todos                                                          | Especialmente precisam de ajuda da comunidade                                                                                                      |
+| ---------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Issues** | [Todas as issues](https://github.com/microsoft/markitdown/issues) | [Issues abertas para contribuição](https://github.com/microsoft/markitdown/issues?q=is%3Aissue+is%3Aopen+label%3A%22open+for+contribution%22) |
+| **PRs**    | [Todos os PRs](https://github.com/microsoft/markitdown/pulls)     | [PRs abertos para revisão](https://github.com/microsoft/markitdown/pulls?q=is%3Apr+is%3Aopen+label%3A%22open+for+reviewing%22)              |
 
 </div>
 
-### Running Tests and Checks
+### Executando testes e verificações
 
-- Navigate to the MarkItDown package:
+- Vá até o pacote MarkItDown:
 
   ```sh
   cd packages/markitdown
   ```
 
-- Install `hatch` in your environment and run tests:
+- Instale o `hatch` no seu ambiente e execute os testes:
 
   ```sh
-  pip install hatch  # Other ways of installing hatch: https://hatch.pypa.io/dev/install/
+  pip install hatch  # Outras formas de instalar o hatch: https://hatch.pypa.io/dev/install/
   hatch shell
   hatch test
   ```
 
-  (Alternative) Use the Devcontainer which has all the dependencies installed:
+  (Alternativa) Use o Devcontainer, que já tem todas as dependências instaladas:
 
   ```sh
-  # Reopen the project in Devcontainer and run:
+  # Reabra o projeto no Devcontainer e execute:
   hatch test
   ```
 
-- Run pre-commit checks before submitting a PR: `pre-commit run --all-files`
+- Execute as verificações do pre-commit antes de enviar um PR: `pre-commit run --all-files`
 
-### Security Considerations
+### Considerações de segurança
 
-MarkItDown performs I/O with the privileges of the current process. Like `open()` or `requests.get()`, it will access resources that the process itself can access.
+O MarkItDown realiza operações de entrada e saída com os privilégios do processo atual. Assim como `open()` ou `requests.get()`, ele acessa os recursos que o próprio processo consegue acessar.
 
-**Sanitize your inputs:** Do not pass untrusted input directly to MarkItDown. If any part of the input may be controlled by an untrusted user or system, such as in hosted or server-side applications, it must be validated and restricted before calling MarkItDown. Depending on your environment, this may include restricting file paths, limiting URI schemes and network destinations, and blocking access to private, loopback, link-local, or metadata-service addresses.
+**Sanitize suas entradas:** não passe entradas não confiáveis diretamente ao MarkItDown. Se qualquer parte da entrada puder ser controlada por um usuário ou sistema não confiável, como em aplicações hospedadas ou do lado do servidor, ela precisa ser validada e restringida antes de chamar o MarkItDown. Dependendo do seu ambiente, isso pode incluir restringir caminhos de arquivo, limitar esquemas de URI e destinos de rede, e bloquear o acesso a endereços privados, de loopback, link-local ou de serviços de metadados.
 
-**Call only the conversion method you need:** Prefer the narrowest conversion API that fits your use case. MarkItDown's `convert()` method is intentionally permissive and can handle local files, remote URIs, and byte streams. If your application only needs to read local files, call `convert_local()` instead. If you need more control over URI fetching, call `requests.get()` yourself and pass the response object to `convert_response()`. For maximum control, open a stream to the input you want converted and call `convert_stream()`.
+**Chame apenas o método de conversão de que você precisa:** prefira a API de conversão mais restrita que atenda ao seu caso de uso. O método `convert()` do MarkItDown é intencionalmente permissivo e consegue lidar com arquivos locais, URIs remotas e fluxos de bytes. Se sua aplicação só precisa ler arquivos locais, chame `convert_local()` em vez dele. Se você precisa de mais controle sobre a busca de URIs, chame `requests.get()` por conta própria e passe o objeto de resposta para `convert_response()`. Para controle máximo, abra um fluxo para a entrada que deseja converter e chame `convert_stream()`.
 
-### Contributing 3rd-party Plugins
+### Contribuindo com plugins de terceiros
 
-You can also contribute by creating and sharing 3rd party plugins. See `packages/markitdown-sample-plugin` for more details.
+Você também pode contribuir criando e compartilhando plugins de terceiros. Veja `packages/markitdown-sample-plugin` para mais detalhes.
 
-## Trademarks
+## Marcas registradas
 
-This project may contain trademarks or logos for projects, products, or services. Authorized use of Microsoft
-trademarks or logos is subject to and must follow
-[Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
-Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
-Any use of third-party trademarks or logos are subject to those third-party's policies.
+Este projeto pode conter marcas registradas ou logotipos de projetos, produtos ou serviços. O uso autorizado de marcas
+registradas ou logotipos da Microsoft está sujeito e deve seguir as
+[Diretrizes de Marca Registrada e Marca da Microsoft](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
+O uso de marcas registradas ou logotipos da Microsoft em versões modificadas deste projeto não deve causar confusão nem sugerir patrocínio da Microsoft.
+Qualquer uso de marcas registradas ou logotipos de terceiros está sujeito às políticas desses terceiros.
